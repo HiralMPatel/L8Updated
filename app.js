@@ -96,7 +96,7 @@ app.get("/", async (request, response) => {
   }
   else
   {
-    response.render("login", {
+    response.render("index", {
       title: "Todo Application",
       csrfToken: request.csrfToken(),
     });
