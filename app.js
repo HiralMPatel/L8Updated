@@ -82,15 +82,25 @@ app.use(function (request, response, next) {
 });
 
 app.get("/", async (request, response) => {
-  if (request.session.passport) {
-    res.redirect("/todos");
-  }
+ if(request.isAuthenticated())
+  {
+    if (request.session.passport) {
+      response.redirect("/todos");
+       }
   else{
-  response.render("index", {
+     response.render("index", {
     title: "Todo Application",
     csrfToken: request.csrfToken(),
   });
-}
+   }
+  }
+  else
+  {
+    response.render("login", {
+      title: "Todo Application",
+      csrfToken: request.csrfToken(),
+    });
+  }
 });
 app.get(
   "/todos",
@@ -229,7 +239,7 @@ app.post("/users", async function (request, response) {
 
 app.post("/todos",connectEnsureLogin.ensureLoggedIn(),
   async function (request, response) {
-    console.log(request.user);
+   console.log(request.user);
     if(request.body.title== null || request.body.title.length<5)
     {
       request.flash('error', 'please enter a todo title with minimum 5 characters');
@@ -254,7 +264,8 @@ app.post("/todos",connectEnsureLogin.ensureLoggedIn(),
       request.flash("error", error.message);
       return response.status(422).json(error);
     }
-  }
+    }
+ 
 );
 
 app.put(
