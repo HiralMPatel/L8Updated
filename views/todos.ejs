@@ -54,7 +54,18 @@
     <div class="grid grid-cols-6">
         <div class="col-start-3 col-span-2">
             <%- include('header.ejs') %>
-           <a href="/signout" class="text-green-600">Signout</a>
+            <div class="flex justify-between">
+                <div>
+                    <h3 class="text-green-600 content-between">Welcome <%= userName %> !!!! </h3>
+                </div>
+                <div>
+                    <a href="/signout" class="text-green-600 ">Signout</a>
+                </div>
+
+            </div>
+            
+        
+
            <% if(messages && messages.error && messages.error.length > 0)  { %>
             <% for(var i=0; i<messages.error.length; i++) { %>
                     <h3 class="text-red-900 font-bold"> <%= messages.error[i] %></h3>
@@ -63,8 +74,10 @@
             <form action="/todos" method="post">
                               
                 <input type="hidden"  name="_csrf" value="<%= csrfToken %>"/>
+                <div> <br></div>
                 
                 <div class="flex gap-2" py="4">
+                    
                     <div class="flex-auto">
                         <input type="text" name="title" placeholder="What's Next?" class="border border-gray-300 rounded text-gray-900 w-full p-2 text-sm"></input>
                     </div>

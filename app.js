@@ -96,6 +96,7 @@ app.get(
   "/todos",
   connectEnsureLogin.ensureLoggedIn(),async (request, response) => {
     // console.log(request.user);
+    const userName = request.user.firstName;
     const loggedInUser = request.user.id;
     const allTodos = await Todo.getTodos();
     const overdue = await Todo.overDue(loggedInUser);
@@ -106,6 +107,7 @@ app.get(
     if (request.accepts("html")) {
       response.render("todos", {
         allTodos,
+        userName,
         overdue,
         dueLater,
         dueToday,
@@ -278,10 +280,10 @@ app.delete("/todos/:id",connectEnsureLogin.ensureLoggedIn(),async function (requ
     // First, we have to query our database to delete a Todo by ID.
     // Then, we have to respond back with true/false based on whether the Todo was deleted or not.
     // response.send(true)
-    const todo = await Todo.findByPk(request.params.id);
+    //const todo = await Todo.findByPk(request.params.id);
     try {
       //const deletedTodo =
-      await todo.destroy();
+      await Todo.remove(request.params.id,request.user.id);
       return response.send(true);
     } catch (error) {
       console.log(error);
