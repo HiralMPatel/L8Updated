@@ -202,6 +202,60 @@ describe("Todo Application", function () {
     catch(err)
     {console.log(err);}
     });
+    test("User can not mark or  unmark other user's todo", async () => {
+      try{
+      let res = await agent.get("/signup");
+      let csrfToken = extractCsrfToken(res);
+      res = await agent.post("/users").send({
+        firstName: "Aneri",
+        lastName: "Patel",
+        email: "aneripatel@gmail.com",
+        password: "111",
+        _csrf: csrfToken,
+      });
+      res = await agent.get("/todos");
+      csrfToken = extractCsrfToken(res);
+      res = await agent.post("/todos").send({
+        title: "Buy milk",
+        dueDate: new Date().toISOString(),
+        completed: false,
+        _csrf: csrfToken,
+      });
+      const aneriId = res.id;
+      await agent.get("/signout");
+      res = await agent.get("/signup");
+      csrfToken = extractCsrfToken(res);
+      res = await agent.post("/users").send({
+        firstName: "Ayushi",
+        lastName: "Patel",
+        email: "ayushipatel@gmail.com",
+        password: "111",
+        _csrf: csrfToken,
+      });
+      res = await agent.get("/todos");
+      csrfToken = extractCsrfToken(res);
+      const markCompleteResponse = await agent
+        .put(`/todos/${aneriId}`)
+        .send({
+          _csrf: csrfToken,
+          completed: true,
+        });
+      expect(markCompleteResponse.statusCode).toBe(422);
+      res = await agent.get("/todos");
+      csrfToken = extractCsrfToken(res);
+  
+      const markNotCompleteResponse = await agent
+      .put(`/todos/${aneriId}`)
+      .send({
+        _csrf: csrfToken,
+        completed: false,
+      });
+    const parsedUpdateResponse = JSON.parse(markNotCompleteResponse.text);
+    expect(parsedUpdateResponse.completed).toBe(false);
+  }catch(err)
+  {console.log(err);}
+});
+});
   
   test("Deletes a todo with the given ID if it exists and sends a boolean response", async () => {
     // FILL IN YOUR CODE HERE
@@ -236,4 +290,3 @@ describe("Todo Application", function () {
       }catch(err)
       {console.log(err);}
   });
-});

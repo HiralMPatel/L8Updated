@@ -134,11 +134,23 @@ app.get(
     }
   }
 );
-app.get("/signup", (request, response) =>{
+app.get("/signup", async (request, response) =>{
+  /*if(request.body.email)
+  {
+    let user1 = await User.findOne({email:request.body.email});
+    if (user1) {
+      request.flash("error", "Already registered!!! Use other email Id");
+      response.redirect('/signup');
+        //return response.status(400).json({ ok: false, msg: 'already exist' });
+    }
+  }
+  else
+  {*/
   response.render("signup", {
     title: "signup",
     csrfToken: request.csrfToken(),
   });
+//}
 });
 
 /*app.get("/todos", async function (request, response) {
@@ -191,6 +203,7 @@ app.get("/signout", (request, response, next) => {
   });
 });
 app.post("/users", async function (request, response) {
+  try {
   console.log(request.body);
   if(request.body.firstName.length<1 )
   {
@@ -215,13 +228,24 @@ app.post("/users", async function (request, response) {
   // hash password using bcrypt
   const hashedPwd = await bcrypt.hash(request.body.password, saltRounds);
   console.log(hashedPwd);
-  try {
-    const user = await User.create({
+
+
+    /*const useremail  = request.body.email;
+    let user1 = await User.findOne({email:useremail});
+    if (user1) {
+      request.flash("error", "Already registered!!! Use other email Id");
+      response.redirect('/signup');
+        //return response.status(400).json({ ok: false, msg: 'already exist' });
+    }
+   else
+   {*/
+    const user=await User.create({
       firstName: request.body.firstName,
       lastName: request.body.lastName,
       email: request.body.email,
       password: hashedPwd,
     });
+    
     request.login(user, (err) => {
       if (err) {
         console.log(err);
@@ -229,13 +253,16 @@ app.post("/users", async function (request, response) {
       }
       return response.redirect("/todos");
     });
-  } catch (error) {
-    console.log(error);
-    request.flash("error", error.message);
-    return response.status(422).json(error);
-    //return response.redirect("/signup");
+ 
   }
-});
+ //} 
+ catch (error) {
+    console.log(error);
+    request.flash("error", "Already registered Email Id!!!!");
+     return response.redirect('/signup');
+  }
+
+  });
 
 app.post("/todos",connectEnsureLogin.ensureLoggedIn(),
   async function (request, response) {
